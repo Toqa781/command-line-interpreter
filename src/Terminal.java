@@ -63,4 +63,23 @@ public class Terminal {
             }
         }
     }
+
+    public static void ls(File directory, boolean showAll, boolean recursive) {
+        File[] files = directory.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                //(if ls -a)
+                if (showAll || !file.getName().startsWith(".")) {
+                    System.out.println(file.getName());
+                }
+                //(if ls -r)
+                if (recursive && file.isDirectory()) {
+                    System.out.println("[" + file.getName() + "]:");
+                    ls(file, showAll, true);
+                }
+            }
+        } else {
+            System.out.println("Error accessing directory: " + directory.getPath());
+        }
+    }
 }
