@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -50,11 +51,20 @@ public class Main {
                 }
                 if (lastSlash != -1){
                     command = nextCommand;
-               } 
-
+                } else if (cmd.equalsIgnoreCase("ls")) {
+                    boolean showAll = parser.isShowAll();
+                    boolean reverseOrder = parser.isReverseOrder();
+                    terminal.ls(new File(currentDirectory), showAll, reverseOrder);
+                } else {
+                    System.out.println("Unknown command: " + cmd);
+                }
+                if (lastSlash != -1) {
+                    command = nextCommand;
+                }
 
             }
         }
-
     }
+
+
 }
