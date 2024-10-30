@@ -68,18 +68,19 @@ public class Terminal {
         }
     }
 
-    public static void ls(File directory, boolean showAll, boolean recursive) {
+    public static void ls(File directory, boolean showAll, boolean reverse) {
         File[] files = directory.listFiles();
         if (files != null) {
+            // (ls -r)
+            if (reverse) {
+                java.util.Arrays.sort(files, (a, b) -> b.getName().compareTo(a.getName()));
+            } else {
+                java.util.Arrays.sort(files, Comparator.comparing(File::getName));
+            }
+             //(ls -a)
             for (File file : files) {
-                //(if ls -a)
                 if (showAll || !file.getName().startsWith(".")) {
                     System.out.println(file.getName());
-                }
-                //(if ls -r)
-                if (recursive && file.isDirectory()) {
-                    System.out.println("[" + file.getName() + "]:");
-                    ls(file, showAll, true);
                 }
             }
         } else {
