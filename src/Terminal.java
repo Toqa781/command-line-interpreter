@@ -69,7 +69,7 @@ public class Terminal {
         }
     }
 
-    public static void ls(File directory, boolean showAll, boolean reverse) {
+    public void ls (File directory, boolean showAll, boolean reverse) {
         File[] files = directory.listFiles();
         if (files != null) {
             // (ls -r)
@@ -78,7 +78,7 @@ public class Terminal {
             } else {
                 java.util.Arrays.sort(files, Comparator.comparing(File::getName));
             }
-             //(ls -a)
+            //(ls -a)
             for (File file : files) {
                 if (showAll || !file.getName().startsWith(".")) {
                     System.out.println(file.getName());
