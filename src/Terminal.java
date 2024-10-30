@@ -4,32 +4,36 @@ public class Terminal {
         System.out.println(Main.currentDirectory);
     }
 
-    public void cd(String args,String address){
-        if(args.equalsIgnoreCase("~")){
-            Main.currentDirectory=Main.homeDirectory;
+    public void cd(String... args) {
+        if (args.length == 0) {
+            Main.currentDirectory = Main.homeDirectory;
+            System.out.println("Changed to root directory: " + Main.currentDirectory);
+            return;
         }
-        else if(args.equalsIgnoreCase("-")){
-            try {
-                int lastSlash=address.lastIndexOf("\\");
-                String addressParent=address.substring(0,lastSlash);
-                Main.currentDirectory=addressParent;
+        if (args[0].equals("..")) {
+            int lastSlash = Main.currentDirectory.lastIndexOf(File.separator);
+            if (lastSlash > 0) {
+                Main.currentDirectory = Main.currentDirectory.substring(0, lastSlash);
+                System.out.println("Changed to parent directory: " + Main.currentDirectory);
+            } else {
+                System.out.println("You are already at the root directory.");
             }
-            catch (Exception e){
-                System.out.println("You are at the root!");
-            }
+            return;
         }
-        else if(args.equalsIgnoreCase("/")){
-            try {
-                int lastSlash=address.indexOf("\\");
-                String root=address.substring(0,lastSlash);
-                Main.currentDirectory=root;
-            }
-            catch (Exception e){
-                System.out.println("You are at the root!");
-            }
+        // Handle 'cd path' for navigating to a specified path
+        String newPath = args[0];
+        File newDirectory = new File(newPath);
+
+        // If the specified path is relative, resolve it against the current directory
+        if (!newDirectory.isAbsolute()) {
+            newDirectory = new File(Main.currentDirectory, newPath);
         }
-        else
-            System.out.println("cd command only take one of this arguments -,~,/");
+        if (newDirectory.isDirectory()) {
+            Main.currentDirectory = newDirectory.getAbsolutePath();
+            System.out.println("Changed directory to: " + Main.currentDirectory);
+        } else {
+            System.out.println("The specified path does not exist or is not a directory: " + newPath);
+        }
     }
     public void mkdir(String directoryName){
         if(directoryName.length()==0)
