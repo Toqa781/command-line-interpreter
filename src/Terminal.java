@@ -1,67 +1,64 @@
 import java.io.File;
+import java.util.Comparator;
 public class Terminal {
     public void pwd(){
         System.out.println(Main.currentDirectory);
     }
 
-    public void cd(String... args) {
-        if (args.length == 0) {
-            Main.currentDirectory = Main.homeDirectory;
-            System.out.println("Changed to root directory: " + Main.currentDirectory);
-            return;
-        }
-        if (args[0].equals("..")) {
-            int lastSlash = Main.currentDirectory.lastIndexOf(File.separator);
-            if (lastSlash > 0) {
-                Main.currentDirectory = Main.currentDirectory.substring(0, lastSlash);
-                System.out.println("Changed to parent directory: " + Main.currentDirectory);
-            } else {
-                System.out.println("You are already at the root directory.");
+    public void cd(String args,String address){
+        if(args.equalsIgnoreCase("..")){
+            try {
+                int lastSlash=address.lastIndexOf("\\");
+                String addressParent=address.substring(0,lastSlash);
+                Main.currentDirectory=addressParent;
             }
-            return;
+            catch (Exception e){
+                System.out.println("You are at the root!");
+            }
         }
-        // Handle 'cd path' for navigating to a specified path
-        String newPath = args[0];
-        File newDirectory = new File(newPath);
-
-        // If the specified path is relative, resolve it against the current directory
-        if (!newDirectory.isAbsolute()) {
-            newDirectory = new File(Main.currentDirectory, newPath);
+        else if(args.equalsIgnoreCase("")){
+            try {
+                int lastSlash=address.indexOf("\\");
+                String root=address.substring(0,lastSlash);
+                Main.currentDirectory=root;
+            }
+            catch (Exception e){
+                System.out.println("You are at the root!");
+            }
         }
-        if (newDirectory.isDirectory()) {
-            Main.currentDirectory = newDirectory.getAbsolutePath();
-            System.out.println("Changed directory to: " + Main.currentDirectory);
-        } else {
-            System.out.println("The specified path does not exist or is not a directory: " + newPath);
+        else{
+            File targetDir=new File(args);
+            if (targetDir.exists() && targetDir.isDirectory()) {
+                Main.currentDirectory = targetDir.getAbsolutePath();
+            } else {
+                System.out.println("The specified path does not exist or is not a directory.");
+            }
         }
     }
     public void mkdir(String directoryName){
-        if(directoryName.length()==0)
+        if(directoryName.length() == 0) {
             System.out.println("mkdir takes a directory name parameter!");
-        else{
-            File newDirectory=new File(directoryName);  //make a new file in the current directory
+        } else {
+            File newDirectory = new File(Main.currentDirectory + "\\" + directoryName);
             if(!newDirectory.exists()){
                 newDirectory.mkdir();
-                System.out.println(directoryName+" directory created.");
-            }
-            else{
-                System.out.println("The directory is already exist!");
+                System.out.println(directoryName + " directory created.");
+            } else {
+                System.out.println("The directory already exists!");
             }
         }
     }
 
     public void rmdir(String directoryName){
-        File targetDirectory=new File(directoryName);
-        if(directoryName.length()==0){
+        File targetDirectory = new File(Main.currentDirectory + "\\" + directoryName);
+        if(directoryName.length() == 0) {
             System.out.println("rmdir takes a directory name parameter!");
-        }
-        else{
+        } else {
             if(!targetDirectory.exists()){
-                System.out.println("This directory is not exit");
-            }
-            else{
+                System.out.println("This directory does not exist.");
+            } else {
                 if(targetDirectory.delete())
-                    System.out.println(targetDirectory+" directory deleted.");
+                    System.out.println(directoryName + " directory deleted.");
                 else
                     System.out.println("This directory is not empty!");
             }
