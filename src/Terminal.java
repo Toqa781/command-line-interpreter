@@ -36,7 +36,7 @@ public class Terminal {
         }
     }
 
-    private static void ls(File directory, boolean showAll, boolean reverse) {
+    public static void ls(File directory, boolean showAll, boolean reverse) {
         File[] files = directory.listFiles();
         if (files != null) {
             // (ls -r)
