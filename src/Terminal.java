@@ -3,6 +3,34 @@ public class Terminal {
     public void pwd(){
         System.out.println(Main.currentDirectory);
     }
+
+    public void cd(String args,String address){
+        if(args.equalsIgnoreCase("~")){
+            Main.currentDirectory=Main.homeDirectory;
+        }
+        else if(args.equalsIgnoreCase("-")){
+            try {
+                int lastSlash=address.lastIndexOf("\\");
+                String addressParent=address.substring(0,lastSlash);
+                Main.currentDirectory=addressParent;
+            }
+            catch (Exception e){
+                System.out.println("You are at the root!");
+            }
+        }
+        else if(args.equalsIgnoreCase("/")){
+            try {
+                int lastSlash=address.indexOf("\\");
+                String root=address.substring(0,lastSlash);
+                Main.currentDirectory=root;
+            }
+            catch (Exception e){
+                System.out.println("You are at the root!");
+            }
+        }
+        else
+            System.out.println("cd command only take one of this arguments -,~,/");
+    }
     public void mkdir(String directoryName){
         if(directoryName.length()==0)
             System.out.println("mkdir takes a directory name parameter!");
