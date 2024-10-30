@@ -8,7 +8,52 @@ public class Main {
         Scanner in=new Scanner(System.in);
 
         while(true){
+            Terminal terminal=new Terminal();
+            terminal.pwd();
+            String command=in.nextLine();
+            boolean pipe=true;
+            int commandNumber=0;
+            int lastSlash=0;
+            String nextCommand="";
+            while(pipe && commandNumber<2) {
+                commandNumber++;
+                if (commandNumber == 1) {
+                    lastSlash = command.indexOf("|");
+                }
+                if (lastSlash != -1 && commandNumber == 1) { //check if there pipe to repeate the loop for the second command
+                    nextCommand = command.substring(lastSlash + 2, command.length());
+                    command = command.substring(0, lastSlash);
+                } else pipe = false;
 
+                String[] splited = command.split("\\s+"); //split by space
+                Parser parser = new Parser(splited);
+                String cmd = parser.getCmd();
+
+                if (cmd.equalsIgnoreCase("pwd")) {
+                    if (parser.getFirstArg().equals("")) {
+                        System.out.println("Your current directory is:");
+                        terminal.pwd();
+                        System.out.println();
+                    } else System.out.println("pwd doesn't take any parameters");
+                } else if (cmd.equalsIgnoreCase("mkdir")) {
+                    if (parser.getSecondArg().equals("")) {
+                        terminal.mkdir(parser.getFirstArg());
+                    } else System.out.println("mkdir takes only one parameter");
+                } else if (cmd.equalsIgnoreCase("rmdir")) {
+                    if (parser.getSecondArg().equals("")) {
+                        terminal.rmdir(parser.getFirstArg());
+                    } else System.out.println("rmdir takes only one parameter");
+                } else if (cmd.equalsIgnoreCase("cd")) {
+                    if (parser.getSecondArg().equals("")) {
+                        terminal.cd(parser.getFirstArg(), Main.currentDirectory);
+                    } else System.out.println("cd takes only one parameter");
+                }
+                if (lastSlash != -1)
+                    command = nextCommand;
+
+
+            }
         }
+
     }
 }
