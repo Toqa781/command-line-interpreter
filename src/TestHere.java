@@ -84,6 +84,50 @@ class TestHere {
       terminal.rmdir(dirName); // Remove it
       assertFalse(new File(Main.currentDirectory + "\\" + dirName).exists(), "Directory should have been deleted.");
    }
+   @Test
+    public void testLs() {
+        // Run 'ls' command to list files
+        terminal.ls(new File(Main.currentDirectory), false, false);
+        String output = outContent.toString().trim();
+
+        // Check output for the existence of expected files/directories
+        assertTrue(output.contains("src") || output.contains("Main.java"),
+                "Expected basic files/directories to be listed");
+    }
+
+    @Test
+    public void testLsAll() {
+        // 'ls -a' command to list all files, including hidden ones
+        terminal.ls(new File(Main.currentDirectory), true, false);
+        String output = outContent.toString().trim();
+        assertTrue(output.contains("."),
+                "Expected hidden files/directories to be listed with '-a'");
+    }
+
+    @Test
+    public void testLsReverse() {
+        //  'ls -r' command to list files in reverse alphabetical order
+        terminal.ls(new File(Main.currentDirectory), false, true);
+        String output = outContent.toString().trim();
+        String[] lines = output.split("\\r?\\n");
+        // Check that files are in reverse alphabetical order
+        assertTrue(lines.length > 1, "Expected multiple lines in output");
+        assertTrue(lines[0].compareTo(lines[lines.length - 1]) > 0,
+                "Expected files to be listed in reverse alphabetical order");
+    }
+
+    @Test
+    public void testLsAllReverse() {
+        // Run 'ls -a -r' command to list all files, including hidden ones, in reverse order
+        terminal.ls(new File(Main.currentDirectory), true, true);
+        String output = outContent.toString().trim();
+        String[] lines = output.split("\\r?\\n");
+        // Check that files, including hidden, are in reverse order
+        assertTrue(output.contains("."), "Expected hidden files in the output");
+        assertTrue(lines.length > 1, "Expected multiple lines in output");
+        assertTrue(lines[0].compareTo(lines[lines.length - 1]) > 0,
+                "Expected files to be listed in reverse alphabetical order");
+    }
 
    @AfterEach
    void tearDown() {
