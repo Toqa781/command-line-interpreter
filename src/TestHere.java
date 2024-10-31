@@ -1,6 +1,7 @@
 import org.junit.jupiter.api.*;
 import java.io.File;
 import static org.junit.jupiter.api.Assertions.*;
+import java.io.ByteArrayOutputStream;
 
 class TestHere {
    Terminal terminal;
