@@ -114,7 +114,7 @@ class TestHere {
       terminal.rmdir(dirName); // Remove it
       assertFalse(new File(Main.currentDirectory + "\\" + dirName).exists(), "Directory should have been deleted.");
    }
-   @Test
+  @Test
     public void testLs() {
         // Run 'ls' command to list files
         terminal.ls(new File(Main.currentDirectory), false, false);
