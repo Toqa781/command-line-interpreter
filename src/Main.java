@@ -75,7 +75,12 @@ public class Main {
                     System.arraycopy(splited, 1, rmArgs, 0, splited.length - 1);
                     terminal.rm(rmArgs);
                 } else if (cmd.equalsIgnoreCase("cat")) {
-                    terminal.cat(parser.getFirstArg(), parser.getSecondArg());
+                    // Collect all arguments after the command into an array
+                    String[] catArgs = new String[splited.length - 1];
+                    System.arraycopy(splited, 1, catArgs, 0, splited.length - 1);
+
+                    // Call the cat method with the array of arguments
+                    terminal.cat(catArgs);
                 } else if (cmd.equalsIgnoreCase("help")) {
                     terminal.helpCommand();
                 } else if (cmd.equalsIgnoreCase("exit")) {

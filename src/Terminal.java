@@ -166,11 +166,22 @@ public class Terminal {
     }
 
     // CAT command
-    public void cat(String arg1, String filename) throws IOException {
+    public void cat(String[] fileNames) {
         BufferedReader br;
         String inputString = "";
         Scanner in = new Scanner(System.in);
-        if (arg1.equalsIgnoreCase(">")) {
+
+        if (fileNames.length == 0) {
+            System.out.println("No files provided.");
+            return;
+        }
+
+        if (fileNames[0].equalsIgnoreCase(">")) {
+            if (fileNames.length < 2) {
+                System.out.println("Usage: > <filename>");
+                return;
+            }
+            String filename = fileNames[1];
             try {
                 File myObj = new File(filename);
                 if (myObj.createNewFile()) {
@@ -179,7 +190,7 @@ public class Terminal {
                     System.out.println("File already exists");
                 }
                 try (BufferedWriter bw = new BufferedWriter(new FileWriter(myObj))) {
-                    System.out.println("Write what you want in this file and @exit to close the file");
+                    System.out.println("Write what you want in this file and type @exit to close the file:");
                     while (!inputString.equalsIgnoreCase("@exit")) {
                         inputString = in.nextLine();
                         if (!inputString.equalsIgnoreCase("@exit")) {
@@ -189,12 +200,16 @@ public class Terminal {
                     }
                 }
             } catch (IOException e) {
-                System.out.println("An Error occurred");
-                e.printStackTrace();
+                System.out.println("An Error occurred: " + e.getMessage());
             }
-        } else if (arg1.equalsIgnoreCase(">>")) {
+        } else if (fileNames[0].equalsIgnoreCase(">>")) {
+            if (fileNames.length < 2) {
+                System.out.println("Usage: >> <filename>");
+                return;
+            }
+            String filename = fileNames[1];
             try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(filename, true)))) {
-                System.out.println("Write what you want in this file and @exit to close the file");
+                System.out.println("Write what you want in this file and type @exit to close the file:");
                 while (!inputString.equalsIgnoreCase("@exit")) {
                     inputString = in.nextLine();
                     if (!inputString.equalsIgnoreCase("@exit")) {
@@ -202,19 +217,22 @@ public class Terminal {
                     }
                 }
             } catch (IOException e) {
-                System.out.println("Can't write to this file");
+                System.out.println("Can't write to this file: " + e.getMessage());
             }
         } else {
-            try {
-                br = new BufferedReader(new FileReader(arg1));
-                String line;
-                while ((line = br.readLine()) != null) {
-                    System.out.println(line);
+            for (String fileName : fileNames) {
+                try {
+                    br = new BufferedReader(new FileReader(fileName));
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        System.out.println(line);
+                    }
+                    br.close(); // Close the BufferedReader
+                } catch (FileNotFoundException e) {
+                    System.out.println("File not found: " + fileName);
+                } catch (IOException e) {
+                    System.out.println("Can't read file: " + fileName);
                 }
-            } catch (FileNotFoundException e) {
-                System.out.println("File not found");
-            } catch (IOException e) {
-                System.out.println("Can't read file");
             }
         }
     }
