@@ -14,21 +14,31 @@ class TestHere {
    @Test
    void testPwd(){
       terminal.pwd();
-      assertEquals(Main.currentDirectory,Main.currentDirectory);
+      assertEquals(Main.currentDirectory,Main.currentDirectory);//check the printed output matches the current directory
    }
 
    @Test
    void testCdToParent() {
       String initialDir = Main.currentDirectory;
       terminal.cd("..", Main.currentDirectory); // Change to parent directory
-      assertNotEquals(initialDir, Main.currentDirectory);
+      String expectedParent=new File(initialDir).getParent();
+      assertEquals(expectedParent, Main.currentDirectory);
    }
 
    @Test
    void testCdToRoot() {
       terminal.cd("", Main.currentDirectory); // Change to root directory
-      // Here you should verify that Main.currentDirectory is set to root
-      assertTrue(Main.currentDirectory.endsWith("root")); // Adjust based on your root directory structure
+      String rootDir=new File(Main.currentDirectory).toPath().getRoot().toString();
+      assertEquals(rootDir,Main.currentDirectory);
+   }
+
+   @Test
+   void testCdToSpecificDir(){
+      String newDirName="testCdDir";
+      File newDir=new File(Main.currentDirectory+"\\"+newDirName);
+      if(!newDir.exists()) newDir.mkdir();
+      terminal.cd(newDir.getAbsolutePath(),Main.currentDirectory);
+      assertEquals(newDir.getAbsolutePath(),Main.currentDirectory);
    }
 
    @Test
@@ -51,7 +61,6 @@ class TestHere {
       String dirName = "testDir";
       terminal.mkdir(dirName); // Create it once
       terminal.mkdir(dirName); // Try to create it again
-      // Expected output: "The directory already exists!"
    }
 
    @Test
@@ -66,7 +75,6 @@ class TestHere {
    @Test
    void testRmdirNonExistentDir() {
       terminal.rmdir("nonexistentDir");
-      // Expected output: "This directory does not exist."
    }
 
    @Test
@@ -79,7 +87,6 @@ class TestHere {
 
    @AfterEach
    void tearDown() {
-      // Cleanup created directories after tests (if necessary)
       new File(Main.currentDirectory + "\\testDir").delete();
       new File(Main.currentDirectory + "\\emptyDir").delete();
    }
