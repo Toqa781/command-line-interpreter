@@ -52,7 +52,25 @@ public class Main {
                     boolean showAll = parser.isShowAll();
                     boolean reverseOrder = parser.isReverseOrder();
                     terminal.ls(new File(currentDirectory), showAll, reverseOrder);
-                } else {
+                }else if (cmd.equalsIgnoreCase("touch")) {
+                    String[] touchArgs = new String[splited.length - 1];
+                    System.arraycopy(splited, 1, touchArgs, 0, splited.length - 1);
+                    terminal.touch(touchArgs);
+                }
+                else if (cmd.equalsIgnoreCase("mv")) {
+                    String[] mvArgs = new String[splited.length - 1];
+                    System.arraycopy(splited, 1, mvArgs, 0, splited.length - 1);
+                    terminal.mv(mvArgs);
+                }
+                else if (cmd.equalsIgnoreCase("rm")) {
+                    String[] rmArgs = new String[splited.length - 1];
+                    System.arraycopy(splited, 1, rmArgs, 0, splited.length - 1);
+                    terminal.rm(rmArgs);
+                }
+                else if (cmd.equalsIgnoreCase("cat")) {
+                    terminal.cat(parser.getFirstArg(),parser.getSecondArg());
+                }
+                else {
                     System.out.println("Unknown command: " + cmd);
                 }
                 if (lastSlash != -1) {
