@@ -166,7 +166,7 @@ public class Terminal {
     }
 
     // CAT command
-    public void cat(String[] fileNames) throws IOException {
+    public void cat(String[] fileNames) {
         BufferedReader br;
         String inputString = "";
         Scanner in = new Scanner(System.in);
