@@ -2,8 +2,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
 
-// import org.junit.*;
-
 public class Main {
     public static String currentDirectory = System.getProperty("user.dir");
     public static final String homeDirectory = System.getProperty("user.dir");
