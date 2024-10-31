@@ -3,6 +3,13 @@ import java.io.File;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 
 class TestHere {
@@ -152,4 +159,185 @@ class TestHere {
       // Optionally add logic in helpCommand that returns true when successfully executed
       assertTrue(true, "Help command executed successfully");
    }
+       @Test
+    void touchShouldCreateFile() {
+        Terminal terminal = new Terminal();
+        String filename = "touchtest.txt";
+        terminal.touch(new String[]{filename});
+        Path path = Paths.get(filename);
+        assertTrue(Files.exists(path));
+    }
+
+    @Test
+    void touchShouldCreateMultFiles() {
+        Terminal terminal = new Terminal();
+        String[] fileNames = {"file1.txt", "file2.txt"};
+        terminal.touch(fileNames);
+
+        for (String fileName : fileNames) {
+            Path path = Paths.get(fileName);
+            assertTrue(Files.exists(path));
+        }
+    }
+
+    @Test
+    void touchIfFilesAlreadyExists() {
+        Terminal terminal = new Terminal();
+        String fileName = "file1.txt";
+        terminal.touch(new String[]{fileName});
+
+        Path path = Paths.get(fileName);
+        assertTrue(Files.exists(path));
+    }
+
+    @Test
+    public void rmShouldRemoveFile() throws Exception {
+        Terminal terminal = new Terminal();
+        //String fileName = "testfile.txt";
+        //Files.createFile(Paths.get(fileName));
+
+        terminal.rm(new String[]{"h.txt"});
+
+        assertFalse(Files.exists(Paths.get("h.txt")));
+    }
+    @Test void rmShouldRemoveDirectory() throws IOException {
+        Terminal terminal = new Terminal();
+        String dirname = "folder1";
+        terminal.rm(new String[]{dirname});
+        assertFalse(Files.exists(Paths.get(dirname)));
+    }
+    @Test
+    public void rmtestRemoveNonExistentFile() throws Exception {
+        Terminal terminal = new Terminal();
+        terminal.rm(new String[]{"nonexistentfile.txt"});
+    }
+    @Test
+    public void rmShouldRemoveMultFilesOrDirectories() throws Exception {
+        Terminal terminal = new Terminal();
+        String file1 = "lol.txt";
+        String file2 = "lol2.txt";
+        String dir = "folder2";
+//        Files.createFile(Paths.get(file1));
+//        Files.createFile(Paths.get(file2));
+//        Files.createDirectories(Paths.get(dir));
+        terminal.rm(new String[]{file1, file2, dir});
+        assertFalse(Files.exists(Paths.get(file1)));
+        assertFalse(Files.exists(Paths.get(file2)));
+        assertFalse(Files.exists(Paths.get(dir)));
+    }
+    @Test void mvShouldMoveTwoFiles() throws IOException {
+        String FILE1 = "file1.txt";
+        String FILE2 = "file2.txt";
+        Files.createFile(Paths.get(FILE1));
+        Files.createFile(Paths.get(FILE2));
+        Terminal.mv(FILE1, FILE2);
+        assertFalse(Files.exists(Paths.get(FILE1)));
+    }
+    @Test void mvShouldMoveTwoDirectories() throws IOException {
+        String DIR1 = "testdir1";
+        String DIR2 = "testdir2";
+        Files.createDirectory(Paths.get(DIR1));
+        Files.createDirectory(Paths.get(DIR2));
+        Terminal.mv(DIR1, DIR2);
+        assertFalse(Files.exists(Paths.get(DIR1)));
+    }
+    @Test
+    void mvShouldMoveMultFilesToDirectory() throws IOException {
+        String DIR = "testdir";
+        String FILE1 = "file3.txt";
+        String FILE2 = "file4.txt";
+        Files.createFile(Paths.get(FILE1));
+        Files.createFile(Paths.get(FILE2));
+        Files.createDirectory(Paths.get(DIR));
+        Terminal.mv(FILE1, FILE2, DIR);
+
+        assertFalse(Files.exists(Paths.get(FILE1)));
+        assertFalse(Files.exists(Paths.get(FILE2)));
+        assertTrue(Files.exists(Paths.get(DIR, "file3.txt")));
+        assertTrue(Files.exists(Paths.get(DIR, "file4.txt")));
+    }
+    @Test
+    void catShouldPrintFileContent() throws IOException {
+        Terminal terminal = new Terminal();
+        String fileName = "singlefile.txt";
+        String fileContent = "Content of the single file. ";
+        Files.write(Paths.get(fileName), fileContent.getBytes());
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
+        terminal.cat(new String[]{fileName});
+        String actualOutput = outContent.toString().replace("\r\n", "\n");
+        String expectedOutput = (fileContent + "\n").replace("\r\n", "\n");
+        assertEquals(expectedOutput, actualOutput);
+    }
+
+    @Test
+    void catShouldCreateNewFile() {
+        Terminal terminal = new Terminal();
+        String fileName = "newestfile.txt";
+
+        String simulatedInput = "Test content\n@exit\n";
+        System.setIn(new ByteArrayInputStream(simulatedInput.getBytes()));
+
+        terminal.cat(new String[]{">", fileName});
+
+        assertTrue(Files.exists(Paths.get(fileName)));
+
+    }
+
+    @Test
+    void catShouldAppendToExistingFile() throws IOException {
+        Terminal terminal = new Terminal();
+        String fileName = "appendfile.txt";
+        //Files.createFile(Paths.get(fileName));
+
+        String inputText = "Hello World";
+        System.setIn(new ByteArrayInputStream((inputText + "\n@exit\n").getBytes()));
+        terminal.cat(new String[]{">>", fileName});
+
+        String content = new String(Files.readAllBytes(Paths.get(fileName)));
+        assertTrue(content.contains(inputText));
+
+    }
+    @Test
+    void catShouldReadAndPrintFilesContents() throws IOException {
+        Terminal terminal = new Terminal();
+        String[] fileNames = {
+                "file1.txt",
+                "file2.txt",
+                "file3.txt"
+        };
+
+        String[] fileContents = {
+                "This is the first test file.",
+                "This is the second test file.",
+                "This is the third test file."
+        };
+
+        for (int i = 0; i < fileNames.length; i++) {
+            Files.write(Paths.get(fileNames[i]), fileContents[i].getBytes());
+        }
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
+
+        terminal.cat(fileNames); // Pass the array of file names
+
+        String expectedOutput = String.join(System.lineSeparator(), fileContents) + System.lineSeparator();
+
+        String actualOutput = outContent.toString().replace("\r", "").replace("\n", System.lineSeparator());
+
+        assertEquals(expectedOutput, actualOutput);
+    }
+    @Test
+    void cattestFileNotFound() {
+        Terminal terminal = new Terminal();
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
+
+        terminal.cat(new String[]{"nonexistent.txt"});
+
+        String expectedOutput = "File not found: nonexistent.txt\n";
+        String actualOutput = outContent.toString().replace("\r\n", "\n");
+
+        assertEquals(expectedOutput.replace("\r\n", "\n"), actualOutput);
+    }
 }
