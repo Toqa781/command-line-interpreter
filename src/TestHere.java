@@ -38,7 +38,6 @@ class TestHere {
       terminal=new Terminal();
       Main.currentDirectory=System.getProperty("user.dir");
       System.setOut(new PrintStream(outContent));
-        outContent.reset();
    }
 
    @Test
@@ -93,16 +92,25 @@ class TestHere {
       terminal.mkdir(dirName); // Try to create it again
    }
 
-   @Test
-   void testRmdir() {
-      String dirName = "testDir";
-      terminal.mkdir(dirName); // Ensure the directory exists
-      terminal.rmdir(dirName); // Now remove it
-      File deletedDir = new File(Main.currentDirectory + "\\" + dirName);
-      assertFalse(deletedDir.exists(), "Directory should have been deleted.");
-   }
+    @Test
+    void testRmdir() {
+        String dirName = "testDir";
+        terminal.mkdir(dirName); // Ensure the directory exists
 
-   @Test
+        File testDir = new File(Main.currentDirectory, dirName);
+        assertTrue(testDir.exists() && testDir.isDirectory(), "Directory should exist after mkdir.");
+
+        // Print directory path to ensure it matches the intended path
+        System.out.println("Deleting directory: " + testDir.getAbsolutePath());
+
+        // Now remove it
+        terminal.rmdir(dirName);
+        assertFalse(testDir.exists(), "Directory should have been deleted.");
+    }
+
+
+
+    @Test
    void testRmdirNonExistentDir() {
       terminal.rmdir("nonexistentDir");
    }
@@ -114,7 +122,7 @@ class TestHere {
       terminal.rmdir(dirName); // Remove it
       assertFalse(new File(Main.currentDirectory + "\\" + dirName).exists(), "Directory should have been deleted.");
    }
-  @Test
+   @Test
     public void testLs() {
         // Run 'ls' command to list files
         terminal.ls(new File(Main.currentDirectory), false, false);
@@ -172,7 +180,6 @@ class TestHere {
    void tearDown() {
       new File(Main.currentDirectory + "\\testDir").delete();
       new File(Main.currentDirectory + "\\emptyDir").delete();
-      System.setOut(originalOut);
    }
 
    @Test
