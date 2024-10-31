@@ -1,33 +1,44 @@
 import java.io.File;
 import java.util.Comparator;
+import java.io.IOException;
+import java.nio.file.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.io.FileNotFoundException;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Scanner;
+
 public class Terminal {
-    public void pwd(){
+    private static boolean isRunning = true; // Keeps track of CLI state
+
+    // PWD command
+    public void pwd() {
         System.out.println(Main.currentDirectory);
     }
 
-    public void cd(String args,String address){
-        if(args.equalsIgnoreCase("..")){
+    // CD command
+    public void cd(String args, String address) {
+        if (args.equalsIgnoreCase("..")) {
             try {
-                int lastSlash=address.lastIndexOf("\\");
-                String addressParent=address.substring(0,lastSlash);
-                Main.currentDirectory=addressParent;
-            }
-            catch (Exception e){
+                int lastSlash = address.lastIndexOf("\\");
+                String addressParent = address.substring(0, lastSlash);
+                Main.currentDirectory = addressParent;
+            } catch (Exception e) {
                 System.out.println("You are at the root!");
             }
-        }
-        else if(args.equalsIgnoreCase("")){
+        } else if (args.equalsIgnoreCase("")) {
             try {
-                int lastSlash=address.indexOf("\\");
-                String root=address.substring(0,lastSlash);
-                Main.currentDirectory=root;
-            }
-            catch (Exception e){
+                int lastSlash = address.indexOf("\\");
+                String root = address.substring(0, lastSlash);
+                Main.currentDirectory = root;
+            } catch (Exception e) {
                 System.out.println("You are at the root!");
             }
-        }
-        else{
-            File targetDir=new File(args);
+        } else {
+            File targetDir = new File(args);
             if (targetDir.exists() && targetDir.isDirectory()) {
                 Main.currentDirectory = targetDir.getAbsolutePath();
             } else {
@@ -35,12 +46,14 @@ public class Terminal {
             }
         }
     }
-    public void mkdir(String directoryName){
-        if(directoryName.length() == 0) {
+
+    // LS command
+    public void mkdir(String directoryName) {
+        if (directoryName.length() == 0) {
             System.out.println("mkdir takes a directory name parameter!");
         } else {
             File newDirectory = new File(Main.currentDirectory + "\\" + directoryName);
-            if(!newDirectory.exists()){
+            if (!newDirectory.exists()) {
                 newDirectory.mkdir();
                 System.out.println(directoryName + " directory created.");
             } else {
@@ -49,15 +62,16 @@ public class Terminal {
         }
     }
 
-    public void rmdir(String directoryName){
+    // RMDIR command
+    public void rmdir(String directoryName) {
         File targetDirectory = new File(Main.currentDirectory + "\\" + directoryName);
-        if(directoryName.length() == 0) {
+        if (directoryName.length() == 0) {
             System.out.println("rmdir takes a directory name parameter!");
         } else {
-            if(!targetDirectory.exists()){
+            if (!targetDirectory.exists()) {
                 System.out.println("This directory does not exist.");
             } else {
-                if(targetDirectory.delete())
+                if (targetDirectory.delete())
                     System.out.println(directoryName + " directory deleted.");
                 else
                     System.out.println("This directory is not empty!");
@@ -65,7 +79,8 @@ public class Terminal {
         }
     }
 
-    public void ls (File directory, boolean showAll, boolean reverse) {
+    // LS command
+    public void ls(File directory, boolean showAll, boolean reverse) {
         File[] files = directory.listFiles();
         if (files != null) {
             // (ls -r)
@@ -74,7 +89,7 @@ public class Terminal {
             } else {
                 java.util.Arrays.sort(files, Comparator.comparing(File::getName));
             }
-            //(ls -a)
+            // (ls -a)
             for (File file : files) {
                 if (showAll || !file.getName().startsWith(".")) {
                     System.out.println(file.getName());
@@ -84,7 +99,9 @@ public class Terminal {
             System.out.println("Error accessing directory: " + directory.getPath());
         }
     }
-        public void rm(String[] fileNames) throws IOException {
+
+    // RM command
+    public void rm(String[] fileNames) throws IOException {
         for (String fileName : fileNames) {
             Path path = Paths.get(fileName);
             if (Files.exists(path)) {
@@ -95,6 +112,7 @@ public class Terminal {
                             Files.delete(file);
                             return FileVisitResult.CONTINUE;
                         }
+
                         @Override
                         public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
                             Files.delete(dir);
@@ -111,6 +129,8 @@ public class Terminal {
             }
         }
     }
+
+    // MV command
     public static void mv(String... paths) {
         if (paths.length < 2) {
             System.out.println("Insufficient arguments provided.");
@@ -129,14 +149,15 @@ public class Terminal {
             } else {
                 // Case 2: Move all files into the target directory
                 if (!isDirectory) {
-                    System.out.println("Last argument must be a directory if moving multiple files.");
+                    System.out.println("Last argument must be a directory if moving multipl files.");
                     return;
                 }
                 for (int i = 0; i < paths.length - 1; i++) {
                     Path sourcePath = Paths.get(paths[i]);
                     Path destinationPath = targetPath.resolve(sourcePath.getFileName());
                     Files.move(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
-                    System.out.println("Moved " + sourcePath.getFileName() + " to " + targetPath);
+                    System.out.println("Moved " + sourcePath.getFileName() + " to " +
+                            targetPath);
                 }
             }
         } catch (IOException e) {
@@ -144,7 +165,7 @@ public class Terminal {
         }
     }
 
-
+    // CAT command
     public void cat(String arg1, String filename) throws IOException {
         BufferedReader br;
         String inputString = "";
@@ -183,7 +204,7 @@ public class Terminal {
             } catch (IOException e) {
                 System.out.println("Can't write to this file");
             }
-        }else {
+        } else {
             try {
                 br = new BufferedReader(new FileReader(arg1));
                 String line;
@@ -198,6 +219,7 @@ public class Terminal {
         }
     }
 
+    // TOUCH command
     public void touch(String[] fileNames) {
         if (fileNames.length == 0) {
             System.out.println("No file names provided for touch command.");
@@ -226,8 +248,36 @@ public class Terminal {
                     System.out.println("File already exists: " + fileName);
                 }
             } catch (IOException e) {
-                System.out.println("Failed to create file " + fileName + ": " + e.getMessage());
+                System.out.println("Failed to create file " + fileName + ": " +
+                        e.getMessage());
             }
         }
+    }
+
+    // Check if the CLI is running
+    public static boolean isRunning() {
+        return isRunning;
+    }
+
+    // EXIT command
+    public void exitCommand() {
+        System.out.println("Exiting the CLI...");
+        isRunning = false;
+    }
+
+    // Internal command to display help information
+    public void helpCommand() {
+        System.out.println("Available Commands:");
+        System.out.println("  pwd      - Show the current directory");
+        System.out.println("  cd       - Change directory");
+        System.out.println("  mkdir    - Create a new directory");
+        System.out.println("  rmdir    - Remove an existing directory");
+        System.out.println("  ls       - List files in the current directory");
+        System.out.println("  touch    - Create a new file");
+        System.out.println("  rm       - Remove a file or directory");
+        System.out.println("  mv       - Move or rename files/directories");
+        System.out.println("  cat      - Display or write to a file");
+        System.out.println("  help     - Show available commands");
+        System.out.println("  exit     - Exit the CLI");
     }
 }
