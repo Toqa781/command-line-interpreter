@@ -37,7 +37,7 @@ class TestHere {
    void setUp(){
       terminal=new Terminal();
       Main.currentDirectory=System.getProperty("user.dir");
-      ystem.setOut(new PrintStream(outContent));
+      System.setOut(new PrintStream(outContent));
         outContent.reset();
    }
 
