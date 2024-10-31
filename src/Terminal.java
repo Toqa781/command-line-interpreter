@@ -260,7 +260,7 @@ public class Terminal {
     }
 
     // EXIT command
-    public void exitCommand() {
+    static public void exitCommand() {
         System.out.println("Exiting the CLI...");
         isRunning = false;
     }
