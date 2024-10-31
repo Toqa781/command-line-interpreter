@@ -84,4 +84,150 @@ public class Terminal {
             System.out.println("Error accessing directory: " + directory.getPath());
         }
     }
+        public void rm(String[] fileNames) throws IOException {
+        for (String fileName : fileNames) {
+            Path path = Paths.get(fileName);
+            if (Files.exists(path)) {
+                if (Files.isDirectory(path)) {
+                    Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+                        @Override
+                        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                            Files.delete(file);
+                            return FileVisitResult.CONTINUE;
+                        }
+                        @Override
+                        public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                            Files.delete(dir);
+                            return FileVisitResult.CONTINUE;
+                        }
+                    });
+                    System.out.println("Removed directory: " + fileName);
+                } else {
+                    Files.delete(path);
+                    System.out.println("Removed file: " + fileName);
+                }
+            } else {
+                System.out.println("File or directory not found: " + fileName);
+            }
+        }
+    }
+    public static void mv(String... paths) {
+        if (paths.length < 2) {
+            System.out.println("Insufficient arguments provided.");
+            return;
+        }
+
+        Path targetPath = Paths.get(paths[paths.length - 1]);
+        boolean isDirectory = Files.isDirectory(targetPath);
+
+        try {
+            if (paths.length == 2 && !isDirectory) {
+                // Case 1: Move contents of file1 into file2 and delete file1
+                Path sourcePath = Paths.get(paths[0]);
+                Files.move(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                System.out.println("File renamed and moved successfully");
+            } else {
+                // Case 2: Move all files into the target directory
+                if (!isDirectory) {
+                    System.out.println("Last argument must be a directory if moving multiple files.");
+                    return;
+                }
+                for (int i = 0; i < paths.length - 1; i++) {
+                    Path sourcePath = Paths.get(paths[i]);
+                    Path destinationPath = targetPath.resolve(sourcePath.getFileName());
+                    Files.move(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+                    System.out.println("Moved " + sourcePath.getFileName() + " to " + targetPath);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Failed to move the file(s): " + e.getMessage());
+        }
+    }
+
+
+    public void cat(String arg1, String filename) throws IOException {
+        BufferedReader br;
+        String inputString = "";
+        Scanner in = new Scanner(System.in);
+        if (arg1.equalsIgnoreCase(">")) {
+            try {
+                File myObj = new File(filename);
+                if (myObj.createNewFile()) {
+                    System.out.println("File Created: " + myObj.getName());
+                } else {
+                    System.out.println("File already exists");
+                }
+                try (BufferedWriter bw = new BufferedWriter(new FileWriter(myObj))) {
+                    System.out.println("Write what you want in this file and @exit to close the file");
+                    while (!inputString.equalsIgnoreCase("@exit")) {
+                        inputString = in.nextLine();
+                        if (!inputString.equalsIgnoreCase("@exit")) {
+                            bw.write(inputString);
+                            bw.newLine();
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                System.out.println("An Error occurred");
+                e.printStackTrace();
+            }
+        } else if (arg1.equalsIgnoreCase(">>")) {
+            try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(filename, true)))) {
+                System.out.println("Write what you want in this file and @exit to close the file");
+                while (!inputString.equalsIgnoreCase("@exit")) {
+                    inputString = in.nextLine();
+                    if (!inputString.equalsIgnoreCase("@exit")) {
+                        out.println(inputString);
+                    }
+                }
+            } catch (IOException e) {
+                System.out.println("Can't write to this file");
+            }
+        }else {
+            try {
+                br = new BufferedReader(new FileReader(arg1));
+                String line;
+                while ((line = br.readLine()) != null) {
+                    System.out.println(line);
+                }
+            } catch (FileNotFoundException e) {
+                System.out.println("File not found");
+            } catch (IOException e) {
+                System.out.println("Can't read file");
+            }
+        }
+    }
+
+    public void touch(String[] fileNames) {
+        if (fileNames.length == 0) {
+            System.out.println("No file names provided for touch command.");
+            return;
+        }
+
+        for (String fileName : fileNames) {
+            if (fileName == null || fileName.trim().isEmpty()) {
+                System.out.println("Invalid file name: " + fileName);
+                continue;
+            }
+
+            Path path = Paths.get(fileName);
+            System.out.println("Attempting to create file at: " + path.toAbsolutePath());
+
+            try {
+                Path parentDir = path.getParent();
+                if (parentDir != null && !Files.exists(parentDir)) {
+                    Files.createDirectories(parentDir);
+                    System.out.println("Created directories: " + parentDir.toAbsolutePath());
+                }
+                if (Files.notExists(path)) {
+                    Files.createFile(path);
+                    System.out.println("File created: " + fileName);
+                } else {
+                    System.out.println("File already exists: " + fileName);
+                }
+            } catch (IOException e) {
+                System.out.println("Failed to create file " + fileName + ": " + e.getMessage());
+            }
+        }
+    }
 }
