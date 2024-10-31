@@ -48,9 +48,6 @@ public class Main {
                     if (parser.getSecondArg().equals("")) {
                         terminal.cd(parser.getFirstArg(), Main.currentDirectory);
                     } else System.out.println("cd takes only one parameter");
-                }
-                if (lastSlash != -1){
-                    command = nextCommand;
                 } else if (cmd.equalsIgnoreCase("ls")) {
                     boolean showAll = parser.isShowAll();
                     boolean reverseOrder = parser.isReverseOrder();
