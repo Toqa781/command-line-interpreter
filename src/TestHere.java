@@ -22,6 +22,8 @@ class TestHere {
    void setUp(){
       terminal=new Terminal();
       Main.currentDirectory=System.getProperty("user.dir");
+      ystem.setOut(new PrintStream(outContent));
+        outContent.reset();
    }
 
    @Test
@@ -99,45 +101,63 @@ class TestHere {
    }
    @Test
     public void testLs() {
+        // Run 'ls' command to list files
         terminal.ls(new File(Main.currentDirectory), false, false);
         String output = outContent.toString().trim();
+
+        // Check output for the existence of expected files/directories
         assertTrue(output.contains("src") || output.contains("Main.java"),
                 "Expected basic files/directories to be listed");
     }
 
     @Test
     public void testLsAll() {
+        // 'ls -a' command to list all files, including hidden ones
         terminal.ls(new File(Main.currentDirectory), true, false);
         String output = outContent.toString().trim();
-        assertTrue(output.contains("."),
+
+        // Check for hidden files/directories in output
+        assertTrue(output.contains(".") || output.contains(".gitignore"),
                 "Expected hidden files/directories to be listed with '-a'");
     }
 
     @Test
     public void testLsReverse() {
+        // 'ls -r' command to list files in reverse alphabetical order
         terminal.ls(new File(Main.currentDirectory), false, true);
         String output = outContent.toString().trim();
         String[] lines = output.split("\\r?\\n");
+
+        // Check that files are in reverse alphabetical order
         assertTrue(lines.length > 1, "Expected multiple lines in output");
-        assertTrue(lines[0].compareTo(lines[lines.length - 1]) > 0,
-                "Expected files to be listed in reverse alphabetical order");
+        for (int i = 0; i < lines.length - 1; i++) {
+            assertTrue(lines[i].compareTo(lines[i + 1]) > 0,
+                    "Expected files to be listed in reverse alphabetical order");
+        }
     }
 
     @Test
     public void testLsAllReverse() {
+        // Run 'ls -a -r' command to list all files, including hidden ones, in reverse order
         terminal.ls(new File(Main.currentDirectory), true, true);
         String output = outContent.toString().trim();
         String[] lines = output.split("\\r?\\n");
-        assertTrue(output.contains("."), "Expected hidden files in the output");
+
+        // Check for hidden files in output
+        assertTrue(output.contains(".") || output.contains(".gitignore"),
+                "Expected hidden files in the output");
         assertTrue(lines.length > 1, "Expected multiple lines in output");
-        assertTrue(lines[0].compareTo(lines[lines.length - 1]) > 0,
-                "Expected files to be listed in reverse alphabetical order");
+        for (int i = 0; i < lines.length - 1; i++) {
+            assertTrue(lines[i].compareTo(lines[i + 1]) > 0,
+                    "Expected files to be listed in reverse alphabetical order");
+        }
     }
 
    @AfterEach
    void tearDown() {
       new File(Main.currentDirectory + "\\testDir").delete();
       new File(Main.currentDirectory + "\\emptyDir").delete();
+      System.setOut(originalOut);
    }
 
    @Test
