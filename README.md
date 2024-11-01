@@ -17,7 +17,7 @@ It allows directory navigation, file manipulation, and content display in a simu
 | `cd`     | Change directory                       |
 | `pwd`    | Print working directory                |
 | `mkdir`  | Create a new directory                 |
-| `rmdir`  | Remove an unempty directory            |
+| `rmdir`  | Remove an empty directory            |
 | `ls`     | List files and directories             |
 | `cat`    | Display or edit file contents          |
 | `touch`  | Create a new file                      |
