@@ -49,7 +49,7 @@ Hello, this is a test file.
 
 1- Clone the repository:
 ```bash
-git clone https://github.com/yourusername/command-line-interpreter.git
+git clone https://github.com/Toqa781/command-line-interpreter.git
 cd command-line-interpreter
 ```
 
