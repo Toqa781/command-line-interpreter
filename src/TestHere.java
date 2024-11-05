@@ -43,7 +43,7 @@ class TestHere {
    @Test
    void testPwd(){
       terminal.pwd();
-      assertEquals(Main.currentDirectory,Main.currentDirectory);//check the printed output matches the current directory
+      assertEquals(Main.currentDirectory,outContent.toString().trim());//check the printed output matches the current directory
    }
 
    @Test
